@@ -1,6 +1,7 @@
 import telegram
 from telegram import ChatAction, ParseMode ,InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from telegram.ext import Updater, MessageHandler, Filters,CommandHandler
+from telegram.ext.dispatcher import run_async
 import time, json, requests, os, youtube_dl, utube_search, wget, random, string
 
 token = json.load(open("db/sec.json","r"))["token"]
@@ -99,6 +100,18 @@ def help(bot,context):
         bot.send_chat_action(chat_id,ChatAction.TYPING)
         bot.send_message(chat_id=chat_id, text=str(err))
 
+@run_async
+def test1():
+    print("test1")
+    time.sleep(60)
+
+@run_async
+def test():
+    print("test0")
+    time.sleep(60)
+    test1()
+
+@run_async
 def send_music(bot,context):
     chat_id = context.message.chat_id
     try:
