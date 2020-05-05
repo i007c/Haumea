@@ -12,6 +12,7 @@ print("Music Video Bot Online\n")
 
 ydl_opts = {'format': 'bestaudio/best','postprocessors': [{'key': 'FFmpegExtractAudio','preferredcodec': 'mp3','preferredquality': '192'}]}
 
+@run_async
 def delete_dir(name_dir:str):
     try:
         os.system(f"rm -rf {name_dir}")
@@ -20,6 +21,7 @@ def delete_dir(name_dir:str):
         with open("log.txt") as f:
             f.write(str(err)+"\n\n")
 
+@run_async
 def upload_music_to_tel(bot,context,namefile,title,msg):
     chat_id = context.message.chat_id
     try:
@@ -33,6 +35,7 @@ def upload_music_to_tel(bot,context,namefile,title,msg):
         bot.send_message(chat_id=chat_id, text=str(err))
         delete_dir(str(chat_id))
 
+@run_async
 def cover_mp4_to_mp3(bot,context,namefile,title,msg):
     chat_id = context.message.chat_id
     try:
@@ -46,6 +49,7 @@ def cover_mp4_to_mp3(bot,context,namefile,title,msg):
         bot.send_message(chat_id=chat_id, text=str(err))
         delete_dir(str(chat_id))
 
+@run_async
 def download_from_youtube(bot,context,namefile,title,url,msg):
     chat_id = context.message.chat_id
     try:
@@ -60,6 +64,7 @@ def download_from_youtube(bot,context,namefile,title,url,msg):
         bot.send_message(chat_id=chat_id, text=str(err))
         delete_dir(str(chat_id))
 
+@run_async
 def get_info_audio(fild_search: str):
     global ydl_opts
     try:
@@ -101,17 +106,6 @@ def help(bot,context):
         bot.send_message(chat_id=chat_id, text=str(err))
 
 @run_async
-def test1():
-    print("test1")
-    time.sleep(60)
-
-@run_async
-def test():
-    print("test0")
-    time.sleep(60)
-    test1()
-
-@run_async
 def send_music(bot,context):
     chat_id = context.message.chat_id
     try:
@@ -130,6 +124,7 @@ def send_music(bot,context):
         bot.send_chat_action(chat_id,ChatAction.TYPING)
         bot.send_message(chat_id=chat_id, text=str(err))
 
+@run_async
 def search_on_youtube(bot,context,args):
     try:
         chat_id = context.message.chat_id
@@ -159,6 +154,7 @@ def search_on_youtube(bot,context,args):
         bot.send_chat_action(chat_id,ChatAction.TYPING)
         bot.send_message(chat_id=chat_id, text=str(err))
 
+@run_async
 def upload_from_web(bot,context,args):
     chat_id = context.message.chat_id
     try:
