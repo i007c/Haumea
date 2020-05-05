@@ -1,17 +1,15 @@
 import telegram
 from telegram import ChatAction, ParseMode ,InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from telegram.ext import Updater, MessageHandler, Filters,CommandHandler
-
-TOKEN = ""
-
 import time, json, requests, os, youtube_dl, utube_search, wget
+
+token = json.load(open("db/sec.json","r"))["token"]
 
 updater = Updater(token)
 os.system("clear")
 print("Music Video Bot Online\n")
 
 ydl_opts = {'format': 'bestaudio/best','postprocessors': [{'key': 'FFmpegExtractAudio','preferredcodec': 'mp3','preferredquality': '192'}]}
-
 
 def get_info_audio(fild_search: str):
     global ydl_opts
@@ -42,13 +40,13 @@ def start(bot,context):
     keyboard = [["🆘 help","🧡 Donate"],["Ⓜ️ Studio Bahram","Report ❗️"]]
     reply_markup = ReplyKeyboardMarkup(keyboard,one_time_keyboard=False,resize_keyboard=True)
     bot.send_chat_action(chat_id,ChatAction.TYPING)
-    bot.send_message(chat_id=chat_id, text="درووود بر تو ای شخصی که اومده اهنگ دانلود کنه 😂\nشوخی رو فقط به چشم یه شوخی ببین 😶\nخلاصه که اگه کمک می خوای بزن روی این  /help\nاگه هم بلدی که هیچی دیگه😑",reply_markup=reply_markup,parse_mode=ParseMode.MARKDOWN)
+    bot.send_message(chat_id=chat_id, text="درووود بر تو ای شخصی که اومده اهنگ دانلود کنه 😂\nشوخی کردم 😶\nخلاصه که اگه کمک می خوای بزن روی این  /help\nاگه هم بلدی که هیچی دیگه😑",reply_markup=reply_markup,parse_mode=ParseMode.MARKDOWN)
 
 def help(bot,context):
     try:
         chat_id = context.message.chat_id
         bot.send_chat_action(chat_id,ChatAction.TYPING)
-        bot.send_message(chat_id=chat_id, text="اصل مطلب 👇🏻👇🏻\n\n1⃣ برای یافتن ویدیو ها این کار رو بکن:\n<code>/seach name_music </code>\nبجای name_music اسم اهنگ یا ویدیو رو بنویس\n\n2⃣ حالا برای دانلود اهنگ ( فایل صوتی ویدیو ) :\nفقط کافیه اسمش یا لینک یوتوبش رو ارسال کنی 😶\nبه‌ همین راحتی\n\nراستی یه سری به استودیو بهرام هم بزن 🤗\n/STUB\n@Studio_Bahram",parse_mode="HTML")
+        bot.send_message(chat_id=chat_id, text="اصل مطلب 👇🏻👇🏻\n\n1⃣ برای یافتن ویدیو ها این کار رو بکن:\n<code>/search name_music </code>\nبجای name_music اسم اهنگ یا ویدیو رو بنویس\n\n2⃣ حالا برای دانلود اهنگ ( فایل صوتی ویدیو ) :\nفقط کافیه اسمش یا لینک یوتوبش رو ارسال کنی 😶\nبه‌ همین راحتی\n\nراستی یه سری به استودیو بهرام هم بزن 🤗\n/STUB\n@Studio_Bahram",parse_mode="HTML")
     except Exception as err:
         bot.send_chat_action(chat_id,ChatAction.TYPING)
         bot.send_message(chat_id=chat_id, text=str(err))
@@ -60,7 +58,7 @@ def send_music(bot,context):
         name_music = context.message.text
         info_video = get_info_audio(name_music)
         if info_video == 0:
-            bot.send_message(chat_id=chat_id, text="خیلی شرمنده 😔 من نتونستم برات اهنگ رو دانلود کنم 😭")
+            bot.send_message(chat_id=chat_id, text="خیلی شرمنده 😔 من نتونستم برات اهنگ رو دانلود کنم ")
             return 0
         bot.send_chat_action(chat_id,ChatAction.TYPING)
         msg = bot.send_message(chat_id=chat_id, text="دارم اهنگ رو دانلود میکنم 😀\nیه کوچولو صبر کنی برات فرستادمش😅")
@@ -87,24 +85,28 @@ def send_music(bot,context):
 def search_on_youtube(bot,context,args):
     try:
         chat_id = context.message.chat_id
-        fild_search = ""
-        for n in args:
-            fild_search += n + " "
+        if len(args) > 0:
+            fild_search = ""
+            for n in args:
+                fild_search += n + " "
 
-        list_search = utube_search.search_on_utube(fild_search,10)
-        if list_search == None:
-            bot.send_message(chat_id=chat_id, text="فک‌ کنم داری اشتباه میزنیا 😶\nمن که چیزی پیدا نکردم 🤐\n\nیه چیز دیگه رو تست کن")
+            msg = bot.send_message(chat_id=chat_id, text="دنبال اینی {} صب کن الان برات میفرستم".format(fild_search))
+            list_search = utube_search.search_on_utube(fild_search,10)
+            if list_search == None:
+                bot.edit_message_text(chat_id=chat_id, text="فک‌ کنم داری اشتباه میزنیا 😶\nمن که چیزی پیدا نکردم 🤐\n\nیه چیز دیگه رو تست کن",message_id=msg.message_id)
+            else:
+                textsend = ""
+                nm = 1
+                for item in list_search:
+                    video_time = item["video_time"]
+                    video_title = item["video_title"][:31]
+                    video_link = item["video_link"]
+                    textsend += f"{nm})  <a href='{video_link}' >{video_title}</a>  {video_time}\n------------------------------------------------------------\n"
+                    nm += 1
+                    
+                bot.edit_message_text(chat_id=chat_id, text=textsend,parse_mode="HTML",message_id=msg.message_id)
         else:
-            textsend = ""
-            nm = 1
-            for item in list_search:
-                video_time = item["video_time"]
-                video_title = item["video_title"][:31]
-                video_link = item["video_link"]
-                textsend += f"{nm})  <a href='{video_link}' >{video_title}</a>  {video_time}\n------------------------------------------------------------\n"
-                nm += 1
-                
-            bot.send_message(chat_id=chat_id, text=textsend,parse_mode="HTML")
+            bot.send_message(chat_id=chat_id, text="حس میکنم داری اشتباه میزنی 😑😐 \n\n<code> /search اسم اهنگ </code>\n\n اینطوریه",parse_mode="HTML")
     except Exception as err:
         bot.send_chat_action(chat_id,ChatAction.TYPING)
         bot.send_message(chat_id=chat_id, text=str(err))
