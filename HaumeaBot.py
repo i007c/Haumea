@@ -12,54 +12,6 @@ print("Music Video Bot Online\n")
 
 ydl_opts = {'format': 'bestaudio/best','postprocessors': [{'key': 'FFmpegExtractAudio','preferredcodec': 'mp3','preferredquality': '192'}]}
 
-def delete_dir(name_dir:str):
-    try:
-        os.system(f"rm -rf {name_dir}")
-    except Exception as err:
-        print(err)
-        with open("log.txt") as f:
-            f.write(str(err)+"\n\n")
-
-def upload_music_to_tel(bot,context,namefile,title,msg):
-    chat_id = context.message.chat_id
-    try:
-        bot.send_chat_action(chat_id,ChatAction.UPLOAD_AUDIO)
-        bot.send_audio(chat_id=chat_id, audio=open(f"{str(chat_id)}/music-{namefile}.mp3","rb"),timeout=1000,title=title)
-        bot.send_chat_action(chat_id,ChatAction.TYPING)
-        bot.edit_message_text(text="خب دیگه دارم برات اپلودش میکنم 😊\nامیدوارم از اهنگت لذت ببری 😉",chat_id=chat_id,message_id=msg.message_id)
-        delete_dir(str(chat_id))
-    except Exception as err:
-        bot.send_chat_action(chat_id,ChatAction.TYPING)
-        bot.send_message(chat_id=chat_id, text=str(err))
-        delete_dir(str(chat_id))
-
-def cover_mp4_to_mp3(bot,context,namefile,title,msg):
-    chat_id = context.message.chat_id
-    try:
-        bot.send_chat_action(chat_id,ChatAction.TYPING)
-        msg1 = bot.edit_message_text(text="خب داریم به جاهای خوبش میرسیم 😋\nاهنگ دانلود شد فقط باید تبدیلش کنم به فایل mp3 و برات بفرستمش زیاد طول نمیکشه بهت قول میدم\nاحتمالا الان که داری این خط رو می خونی دیگه برات فرستادمش 😂😂",chat_id=chat_id,message_id=msg.message_id)
-        bot.send_chat_action(chat_id,ChatAction.UPLOAD_AUDIO)
-        os.system(f"ffmpeg -i {str(chat_id)}/{namefile}.mp4 {str(chat_id)}/music-{namefile}.mp3")
-        upload_music_to_tel(bot,context,namefile,title,msg1)
-    except Exception as err:
-        bot.send_chat_action(chat_id,ChatAction.TYPING)
-        bot.send_message(chat_id=chat_id, text=str(err))
-        delete_dir(str(chat_id))
-
-def download_from_youtube(bot,context,namefile,title,url,msg):
-    chat_id = context.message.chat_id
-    try:
-        bot.send_chat_action(chat_id,ChatAction.TYPING)
-        msg1 = bot.edit_message_text(chat_id=chat_id, text="دارم اهنگ رو دانلود میکنم 😀\nیه کوچولو صبر کنی برات فرستادمش😅",message_id=msg.message_id)
-        bot.send_chat_action(chat_id,ChatAction.UPLOAD_AUDIO)
-        os.system(f"mkdir {str(chat_id)}")
-        wget.download(url, f"{str(chat_id)}/{namefile}.mp4")
-        cover_mp4_to_mp3(bot,context,namefile,title,msg1)
-    except Exception as err:
-        bot.send_chat_action(chat_id,ChatAction.TYPING)
-        bot.send_message(chat_id=chat_id, text=str(err))
-        delete_dir(str(chat_id))
-
 def get_info_audio(fild_search: str):
     global ydl_opts
     try:
@@ -104,17 +56,37 @@ def help(bot,context):
 def send_music(bot,context):
     chat_id = context.message.chat_id
     try:
-        bot.send_chat_action(chat_id,ChatAction.TYPING)
         name_music = context.message.text
-        msg = bot.send_message(chat_id=chat_id, text="دارم دنبال اهنگ میگیرم یه کوچولو صبر کن")
+        
+        bot.send_chat_action(chat_id,ChatAction.TYPING)
+        msg = bot.send_message(chat_id=chat_id, text="دارم دنبال اهنگ میگردم یه کوچولو صبر کن")
+        bot.send_chat_action(chat_id,ChatAction.UPLOAD_AUDIO)
         info_video = get_info_audio(name_music)
         if info_video == 0:
             bot.send_message(chat_id=chat_id, text="خیلی شرمنده 😔 من نتونستم برات اهنگ رو دانلود کنم ")
         else:
             url = info_video["mp4_link"]
             title = info_video["title_video"]
-            namefile = "".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=17))
-            download_from_youtube(bot,context,namefile,title,url,msg)
+            namefile = "".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=27))
+            
+            bot.send_chat_action(chat_id,ChatAction.TYPING)
+            msg = bot.edit_message_text(chat_id=chat_id, text="دارم اهنگ رو دانلود میکنم 😀\nیه کوچولو صبر کنی برات فرستادمش😅",message_id=msg.message_id)
+            # Dowmload file mp4
+            bot.send_chat_action(chat_id,ChatAction.UPLOAD_AUDIO)
+            wget.download(url, f"db/{namefile}.mp4")
+            
+            bot.send_chat_action(chat_id,ChatAction.TYPING)
+            msg = bot.edit_message_text(text="خب داریم به جاهای خوبش میرسیم 😋\nاهنگ دانلود شد فقط باید تبدیلش کنم به فایل mp3 و برات بفرستمش زیاد طول نمیکشه بهت قول میدم\nاحتمالا الان که داری این خط رو می خونی دیگه برات فرستادمش 😂😂",chat_id=chat_id,message_id=msg.message_id)
+            bot.send_chat_action(chat_id,ChatAction.UPLOAD_AUDIO)
+            # Cover mp4 to mp3
+            os.system(f"ffmpeg -i db/{namefile}.mp4 db/music-{namefile}.mp3")
+            # delete file mp4
+            os.system(f"rm db/{namefile}.mp4")
+            # upload to telegram
+            bot.send_audio(chat_id=chat_id, audio=open(f"db/music-{namefile}.mp3","rb"),timeout=1000,title=title)
+            # delete file mp3
+            os.system(f"rm db/music-{namefile}.mp3")
+            bot.delete_message(chat_id=chat_id,message_id=msg.message_id)
     except Exception as err:
         bot.send_chat_action(chat_id,ChatAction.TYPING)
         bot.send_message(chat_id=chat_id, text=str(err))
