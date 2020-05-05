@@ -12,7 +12,6 @@ print("Music Video Bot Online\n")
 
 ydl_opts = {'format': 'bestaudio/best','postprocessors': [{'key': 'FFmpegExtractAudio','preferredcodec': 'mp3','preferredquality': '192'}]}
 
-@run_async
 def delete_dir(name_dir:str):
     try:
         os.system(f"rm -rf {name_dir}")
@@ -21,7 +20,6 @@ def delete_dir(name_dir:str):
         with open("log.txt") as f:
             f.write(str(err)+"\n\n")
 
-@run_async
 def upload_music_to_tel(bot,context,namefile,title,msg):
     chat_id = context.message.chat_id
     try:
@@ -35,7 +33,6 @@ def upload_music_to_tel(bot,context,namefile,title,msg):
         bot.send_message(chat_id=chat_id, text=str(err))
         delete_dir(str(chat_id))
 
-@run_async
 def cover_mp4_to_mp3(bot,context,namefile,title,msg):
     chat_id = context.message.chat_id
     try:
@@ -49,7 +46,6 @@ def cover_mp4_to_mp3(bot,context,namefile,title,msg):
         bot.send_message(chat_id=chat_id, text=str(err))
         delete_dir(str(chat_id))
 
-@run_async
 def download_from_youtube(bot,context,namefile,title,url,msg):
     chat_id = context.message.chat_id
     try:
@@ -64,7 +60,6 @@ def download_from_youtube(bot,context,namefile,title,url,msg):
         bot.send_message(chat_id=chat_id, text=str(err))
         delete_dir(str(chat_id))
 
-@run_async
 def get_info_audio(fild_search: str):
     global ydl_opts
     try:
