@@ -130,3 +130,5 @@ dmypy.json
 
 # my data base [token and more ...]
 db/
+# coala files 
+*.py.orig
