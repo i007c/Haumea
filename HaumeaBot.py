@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Programmer 007
-# this line 4 tst
+
 
 import telegram
 from telegram import ChatAction, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
@@ -44,11 +44,16 @@ def get_info_audio(fild_search: str):
             video = result['entries'][0]
         else:
             video = result
+        for u in video["formats"]:
+            url = u["url"]
+            if requests.get(url).ok:
+                return {"mp4_link": url, "title_video": title_video}
+    
         i1 = len(video["formats"]) - 1
         mp4_link = video["formats"][i1]["url"]
         title_video = video["title"]
-
         return {"mp4_link": mp4_link, "title_video": title_video}
+
     except Exception as err:
         print(err)
         return 0
