@@ -44,6 +44,7 @@ def get_info_audio(fild_search: str):
             video = result['entries'][0]
         else:
             video = result
+        title_video = video["title"]
         for u in video["formats"]:
             url = u["url"]
             if requests.get(url).ok:
@@ -51,7 +52,6 @@ def get_info_audio(fild_search: str):
     
         i1 = len(video["formats"]) - 1
         mp4_link = video["formats"][i1]["url"]
-        title_video = video["title"]
         return {"mp4_link": mp4_link, "title_video": title_video}
 
     except Exception as err:
