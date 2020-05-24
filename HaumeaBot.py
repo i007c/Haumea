@@ -209,14 +209,14 @@ def stb(bot, context):
 def donate(bot, context):
     chat_id = context.message.chat_id
     bot.send_chat_action(chat_id, ChatAction.TYPING)
-    bot.send_message(chat_id=chat_id, text="داداش یا ابجی 😶\nاینو دیگه نمی تونم تشخیص بدم خب 😑\nخلاصه که مرسی از اینکه می خوای حمایت کنی\n\nولی من دنبال حمایت مالی نیستم 😶\nهمین که به یکی از دوستاتم استودیو بهرام رو معرفی کنی بزرگترین حمایت رو به من و استودیو کردی\n\nSite : StudioBahram.ir\nTelegram : T.me/Studio_Bahram\nInstagram : instagram.com/Studio_Bahram.ir\nGitHub : github.com/Studio-Bahram\nDiscord : discord.gg/ZmGWTtZ")
+    text = "پول بهترین دلگرمی و حمایت نیست\n اما با این کار شما من را حمایت می کنید در تولید محصولاتی بهتر و باکیفیت بیشتر \n اگر توان حمایت مالی ندارید اصلا مهم نیست \n همین که در کنار ما هستید بزرگ ترین حمایت است \n لینک حمایت مالی : https://sibmo.ir/i007c"
+    bot.send_message(chat_id=chat_id, text=text)
 
 
 def reporterr(bot, context):
     chat_id = context.message.chat_id
     bot.send_chat_action(chat_id, ChatAction.TYPING)
-    bot.send_message(
-        chat_id=chat_id, text="هرمشکلی بود فقط به خودم بگو 😁😅\nاینم ایدیمه\n@SSBahramBot")
+    bot.send_message(chat_id=chat_id, text="شما می توانید مشکلات و باگ های ربات را به ما گزارش دهید :) \n @SSBahramBot")
 
 
 def error(update, context):
