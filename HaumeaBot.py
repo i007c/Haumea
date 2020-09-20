@@ -21,6 +21,9 @@ def save_error_to_log(error_message):
 
 def download_mp3(fild_search: str):
     try:
+        if os.path.exists("database/audio.mp3"):
+            os.remove("database/audio.mp3")
+
         if fild_search.find("youtube.com") != -1 or fild_search.find("youtu.be") != -1:
             link_video = fild_search
         else:
