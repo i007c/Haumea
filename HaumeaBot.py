@@ -73,7 +73,7 @@ def send_music(bot, context):
         msg = bot.send_message(chat_id=chat_id, text="درحال جستوجو در یوتیوب")
         audio_data = download_mp3(name_music)
 
-        if audio_data:
+        if not audio_data:
             bot.send_message(
                 chat_id=chat_id, text="خیلی شرمنده 😔 من نتونستم برات اهنگ رو دانلود کنم ")
         else:
