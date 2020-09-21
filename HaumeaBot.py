@@ -90,7 +90,7 @@ def start(bot, context):
     reply_markup = ReplyKeyboardMarkup(
         keyboard, one_time_keyboard=False, resize_keyboard=True)
     bot.send_chat_action(chat_id, ChatAction.TYPING)
-    bot.send_message(chat_id=chat_id, text="هاومیا، رباتی برای دانلود تصویر و صدای ویدیو های یوتیوب و دیگر سایت ها\nلینک ویدیو یوتیوب مدنظر  خود را ارسال نمونه و فایل ان را دریافت کنید به سادگی",
+    bot.send_message(chat_id=chat_id, text="هاومیا، رباتی برای دانلود صدای ویدیو های یوتیوب و دیگر سایت ها\nلینک ویدیو یوتیوب مدنظر  خود را ارسال نمونه و فایل ان را دریافت کنید به سادگی",
                      reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 
 @run_async
@@ -103,7 +103,7 @@ def send_file(bot, context):
         vurl = context.message.text
 
         bot.send_chat_action(chat_id, ChatAction.TYPING)
-        msg = bot.send_message(chat_id=chat_id, text="درحال دانلود ویدیو مدنظر شما\nلطفا کمی صبر کنید")
+        msg = bot.send_message(chat_id=chat_id, text="درحال دانلود موسیقی مدنظر شما\nلطفا کمی صبر کنید")
         data_files = download_file(video_link=vurl,client_dirname=str(chat_id))
 
         if data_files["status"] == "Error":
@@ -111,13 +111,13 @@ def send_file(bot, context):
             bot.send_message(chat_id=chat_id, text=f"Error:\n\n{error}")
         else:
             bot.send_chat_action(chat_id, ChatAction.TYPING)
-            msg = bot.edit_message_text(chat_id=chat_id, text="درحال اپلود ویدیو مورد نظر شما", message_id=msg.message_id)
+            msg = bot.edit_message_text(chat_id=chat_id, text="درحال اپلود موسیقی مورد نظر شما", message_id=msg.message_id)
             
-            bot.send_chat_action(chat_id, ChatAction.UPLOAD_VIDEO)
-            bot.send_document(chat_id=chat_id, document=open(data_files["video"]["path"], "rb"), timeout=10000)
-
-            bot.send_chat_action(chat_id, ChatAction.UPLOAD_AUDIO)
-            bot.send_audio(chat_id=chat_id, audio=open(data_files["audio"]["path"], "rb"), timeout=1000)
+            if os.path.getsize(data_files["video"]["path"]) < 50000000:
+                bot.send_chat_action(chat_id, ChatAction.UPLOAD_AUDIO)
+                bot.send_audio(chat_id=chat_id, audio=open(data_files["audio"]["path"], "rb"), timeout=1000)
+            else:
+                bot.send_message(chat_id=chat_id, text="فایل بسیار بزرگ است")
 
             bot.delete_message(chat_id=chat_id, message_id=msg.message_id)
 
