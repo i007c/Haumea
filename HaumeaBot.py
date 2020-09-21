@@ -35,17 +35,17 @@ def download_mp3(fild_search: str):
 
         ydl_opts = {
             "format": "bestvideo+bestaudio/best",
-            "outtmpl": "database/video.mp4",
+            "outtmpl": "database/video.mkv",
             "noplaylist": True,
             "postprocessors": [{
                 "key": "FFmpegVideoConvertor",
-                "preferedformat": "mp4",
+                "preferedformat": "mkv",
             }]
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([link_video])
         
-        audio = ffmpeg.input("database/video.mp4")
+        audio = ffmpeg.input("database/video.mkv")
         audio = ffmpeg.output(audio, "database/audio.mp3")
         ffmpeg.run(audio)
         return {"audio_path": "database/audio.mp3", "audio_name": "audio.mp3"}
