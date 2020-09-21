@@ -132,3 +132,4 @@ dmypy.json
 db/
 # coala files 
 *.py.orig
+nohup.out
