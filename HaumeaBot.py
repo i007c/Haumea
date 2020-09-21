@@ -13,6 +13,14 @@ import utube_search
 import datetime
 import traceback
 import ffmpeg
+import random
+import string
+
+def get_random_string(l:int=20):
+    """
+    l: The length of your desired string
+    """
+    return "".join(random.choices(string.ascii_letters + string.digits, k=l))
 
 def save_error_to_log(error_message):
     error_message = str(error_message)
@@ -20,22 +28,19 @@ def save_error_to_log(error_message):
         el.write(str(error_message)+"\nError time: "+str(datetime.datetime.now())+"\n\n")
 
 
-def download_mp3(fild_search: str):
+def download_file(video_link: str, client_dirname: str):
     try:
-        if os.path.exists("database/audio.mp3"):
-            os.remove("database/audio.mp3")
-        
-        if os.path.exists("database/video.mkv"):
-            os.remove("database/video.mkv")
+        video_name = get_random_string()
+        audio_name = get_random_string()
 
-        if fild_search.find("youtube.com") != -1 or fild_search.find("youtu.be") != -1:
-            link_video = fild_search
-        else:
-            link_video = utube_search.search_on_utube(fild_search)[0]["video_link"]
+        
+        
+        if video_link.find("http") == -1:
+            return {"status":"Error","msg":"متن ارسال شده صحیح نمی باشد\nباید لینک باشد"}
 
         ydl_opts = {
             "format": "bestvideo+bestaudio/best",
-            "outtmpl": "database/video",
+            "outtmpl": f"database/{client_dirname}/{video_name}",
             "noplaylist": True,
             "postprocessors": [{
                 "key": "FFmpegVideoConvertor",
@@ -43,92 +48,76 @@ def download_mp3(fild_search: str):
             }]
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([link_video])
+            ydl.download([video_link])
         
-        audio = ffmpeg.input("database/video.mkv")
-        audio = ffmpeg.output(audio, "database/audio.mp3")
+        audio = ffmpeg.input(f"database/{client_dirname}/{video_name}.mkv")
+        audio = ffmpeg.output(audio, f"database/{client_dirname}/{audio_name}.mp3")
         ffmpeg.run(audio)
-        return {"audio_path": "database/audio.mp3", "audio_name": "audio.mp3"}
+
+        return {
+            "status":"Successful",
+            "video":
+            {
+                "name": video_name + ".mkv",
+                "path": f"database/{client_dirname}/{video_name}.mkv"
+            },
+            "audio":
+            {
+                "name": audio_name + ".mp3",
+                "path": f"database/{client_dirname}/{audio_name}.mp3"
+            }
+        }
 
     except Exception:
-        save_error_to_log(traceback.format_exc())
-        return False
+        error = traceback.format_exc()
+        save_error_to_log(error)
+        return {"status":"Error","msg": str(error)}
 
 
 def start(bot, context):
     chat_id = context.message.chat_id
 
-    keyboard = [["🆘 help", "🧡 Donate"], ["Ⓜ️ Studio Bahram", "Report ❗️"]]
+    keyboard = [["🧡 Donate"], ["Ⓜ️ Studio Bahram", "Report ❗️"]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard, one_time_keyboard=False, resize_keyboard=True)
     bot.send_chat_action(chat_id, ChatAction.TYPING)
-    bot.send_message(chat_id=chat_id, text="درووود بر تو ای شخصی که اومده اهنگ دانلود کنه 😂\nشوخی کردم 😶\nخلاصه که اگه کمک می خوای بزن روی این  /help\nاگه هم بلدی که هیچی دیگه😑",
+    bot.send_message(chat_id=chat_id, text="هاومیا، رباتی برای دانلود تصویر و صدای ویدیو های یوتیوب و دیگر سایت ها\nلینک ویدیو یوتیوب مدنظر  خود را ارسال نمونه و فایل ان را دریافت کنید به سادگی",
                      reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 
-
-def help(bot, context):
-    chat_id = context.message.chat_id
-    bot.send_chat_action(chat_id, ChatAction.TYPING)
-    bot.send_message(chat_id=chat_id, text="اصل مطلب 👇🏻👇🏻\n\n1⃣ برای یافتن ویدیو ها این کار رو بکن:\n<code>/search name_music </code>\nبجای name_music اسم اهنگ یا ویدیو رو بنویس\n\n2⃣ حالا برای دانلود اهنگ ( فایل صوتی ویدیو ) :\nفقط کافیه اسمش یا لینک یوتوبش رو ارسال کنی 😶\n\n3️⃣ یه قابلیت هم هست که می توانی لینک مستقیم اهنگ رو بدی و من اونو برات آپلود کنم توی تلگرام \n اینطوری \n <code> /upload (link.mp3) </code>\n به‌ همین راحتی\n\nراستی یه سری به استودیو بهرام هم بزن 🤗\n/STUB\n@Studio_Bahram", parse_mode="HTML")
-
-
 @run_async
-def send_music(bot, context):
+def send_file(bot, context):
     chat_id = context.message.chat_id
     try:
-        name_music = context.message.text
+        if not os.path.exists(f"database/{chat_id}"):
+            os.makedirs(f"database/{chat_id}")
+
+        vurl = context.message.text
 
         bot.send_chat_action(chat_id, ChatAction.TYPING)
-        msg = bot.send_message(chat_id=chat_id, text="درحال دانلود موسیقی مدنظر شما\nلطفا کمی صبر کنید")
-        audio_data = download_mp3(name_music)
+        msg = bot.send_message(chat_id=chat_id, text="درحال دانلود ویدیو مدنظر شما\nلطفا کمی صبر کنید")
+        data_files = download_file(video_link=vurl,client_dirname=str(chat_id))
 
-        if not audio_data:
-            bot.send_message(
-                chat_id=chat_id, text="خیلی شرمنده 😔 من نتونستم برات اهنگ رو دانلود کنم ")
+        if data_files["status"] == "Error":
+            error = data_files["msg"]
+            bot.send_message(chat_id=chat_id, text=f"Error:\n\n{error}")
         else:
             bot.send_chat_action(chat_id, ChatAction.TYPING)
-            msg = bot.edit_message_text(chat_id=chat_id, text="درحال اپلود موسیقی مورد نظر شما", message_id=msg.message_id)
+            msg = bot.edit_message_text(chat_id=chat_id, text="درحال اپلود ویدیو مورد نظر شما", message_id=msg.message_id)
             
-            bot.send_chat_action(chat_id, ChatAction.UPLOAD_AUDIO)
+            bot.send_chat_action(chat_id, ChatAction.UPLOAD_VIDEO)
+            bot.send_video(chat_id=chat_id, video=open(data_files["video"]["path"], "rb"), timeout=7000)
 
-            bot.send_audio(chat_id=chat_id, audio=open(audio_data["audio_path"], "rb"), timeout=1000)
+            bot.send_chat_action(chat_id, ChatAction.UPLOAD_AUDIO)
+            bot.send_audio(chat_id=chat_id, audio=open(data_files["audio"]["path"], "rb"), timeout=1000)
 
             bot.delete_message(chat_id=chat_id, message_id=msg.message_id)
-    except Exception as err:
-        save_error_to_log(traceback.format_exc())
-        bot.send_message(chat_id=chat_id, text=str(err))
 
+            if os.path.exists(data_files["video"]["path"]):
+                os.remove(data_files["video"]["path"])
+            
+            if os.path.exists(data_files["audio"]["path"]):
+                os.remove(data_files["audio"]["path"])
 
-@run_async
-def search_on_youtube(bot, context, args):
-    try:
-        chat_id = context.message.chat_id
-        if len(args) > 0:
-            fild_search = ""
-            for n in args:
-                fild_search += n + " "
-
-            msg = bot.send_message(
-                chat_id=chat_id, text="متن جستوجوی شما: {}".format(fild_search))
-            list_search = utube_search.search_on_utube(fild_search, 10)
-            if list_search == None:
-                bot.edit_message_text(
-                    chat_id=chat_id, text="فک‌ کنم داری اشتباه میزنیا 😶\nمن که چیزی پیدا نکردم 🤐\n\nیه چیز دیگه رو تست کن", message_id=msg.message_id)
-            else:
-                textsend = ""
-                nm = 1
-                for item in list_search:
-                    video_time = item["video_time"]
-                    video_title = item["video_title"][:31]
-                    video_link = item["video_link"]
-                    textsend += f"{nm})  <a href='{video_link}' >{video_title}</a>  {video_time}\n------------------------------------------------------------\n"
-                    nm += 1
-
-                bot.edit_message_text(
-                    chat_id=chat_id, text=textsend, parse_mode="HTML", message_id=msg.message_id)
-        else:
-            bot.send_message(
-                chat_id=chat_id, text="حس میکنم داری اشتباه میزنی 😑😐 \n\n<code> /search اسم اهنگ </code>\n\n اینطوریه", parse_mode="HTML")
     except Exception as err:
         save_error_to_log(traceback.format_exc())
         bot.send_message(chat_id=chat_id, text=str(err))
@@ -177,10 +166,6 @@ def main():
 
     dp.add_handler(MessageHandler(Filters.text(
         ["/start", "/Start", "Start", "/update"]), start))
-    dp.add_handler(MessageHandler(Filters.text(
-        ["راهنما", "help", "/help", "🆘 help"]), help))
-    dp.add_handler(CommandHandler(
-        "search", search_on_youtube, pass_args=True))
 
     dp.add_handler(MessageHandler(Filters.text(
         ["Ⓜ️ Studio Bahram", "Studio Bahram", "استودیو بهرام", "بهرام", "استودیو", "سازنده", "/STUB"]), stb))
@@ -188,7 +173,7 @@ def main():
         ["/report", "Report ❗️", "report", "Report"]), reporterr))
     dp.add_handler(MessageHandler(Filters.text(
         ["🧡 Donate", "حمایت", "donate", "/donate", "Donate"]), donate))
-    dp.add_handler(MessageHandler(Filters.all, send_music))
+    dp.add_handler(MessageHandler(Filters.all, send_file))
 
 
     updater.start_polling()
