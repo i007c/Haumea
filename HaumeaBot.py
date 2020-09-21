@@ -39,7 +39,7 @@ def download_file(video_link: str, client_dirname: str):
             return {"status":"Error","msg":"متن ارسال شده صحیح نمی باشد\nباید لینک باشد"}
 
         ydl_opts = {
-            "format": "bestvideo+bestaudio/best",
+            "format": "bestaudio",
             "outtmpl": f"database/{client_dirname}/{video_name}.%(ext)s",
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
