@@ -41,11 +41,6 @@ def download_file(video_link: str, client_dirname: str):
         ydl_opts = {
             "format": "bestvideo+bestaudio/best",
             "outtmpl": f"database/{client_dirname}/{video_name}.%(ext)s",
-            # "noplaylist": True,
-            # "postprocessors": [{
-            #     "key": "FFmpegVideoConvertor",
-            #     # "preferedformat": "mkv",
-            # }]
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([video_link])
