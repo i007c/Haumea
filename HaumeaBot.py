@@ -40,17 +40,26 @@ def download_file(video_link: str, client_dirname: str):
 
         ydl_opts = {
             "format": "bestvideo+bestaudio/best",
-            "outtmpl": f"database/{client_dirname}/{video_name}",
+            "outtmpl": f"database/{client_dirname}/{video_name}.%(ext)s",
             "noplaylist": True,
             "postprocessors": [{
                 "key": "FFmpegVideoConvertor",
-                "preferedformat": "mkv",
+                # "preferedformat": "mkv",
             }]
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([video_link])
         
-        audio = ffmpeg.input(f"database/{client_dirname}/{video_name}.mkv")
+        for root, dirs, files in os.walk(f"database/{client_dirname}"):
+            for f in files:
+                if f.find(video_name) != -1:
+                    video_name = f
+                    break
+            else:
+                return {"status":"Error","msg":"خطا در دریافت ویدیو"}
+                    
+        
+        audio = ffmpeg.input(f"database/{client_dirname}/{video_name}")
         audio = ffmpeg.output(audio, f"database/{client_dirname}/{audio_name}.mp3")
         ffmpeg.run(audio)
 
@@ -58,8 +67,8 @@ def download_file(video_link: str, client_dirname: str):
             "status":"Successful",
             "video":
             {
-                "name": video_name + ".mkv",
-                "path": f"database/{client_dirname}/{video_name}.mkv"
+                "name": video_name,
+                "path": f"database/{client_dirname}/{video_name}"
             },
             "audio":
             {
