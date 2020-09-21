@@ -38,7 +38,7 @@ def download_mp3(fild_search: str):
             "outtmpl": "database/video.mp4",
             "noplaylist": True,
             "postprocessors": [{
-                    "key": "FFmpegVideoConvertorPP",
+                    "key": "FFmpegVideoConvertor",
                     "preferredcodec": "mp4",
                     "preferredquality": "192"
             }]
