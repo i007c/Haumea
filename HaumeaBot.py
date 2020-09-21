@@ -25,8 +25,8 @@ def download_mp3(fild_search: str):
         if os.path.exists("database/audio.mp3"):
             os.remove("database/audio.mp3")
         
-        if os.path.exists("database/video.mp4"):
-            os.remove("database/video.mp4")
+        if os.path.exists("database/video.mkv"):
+            os.remove("database/video.mkv")
 
         if fild_search.find("youtube.com") != -1 or fild_search.find("youtu.be") != -1:
             link_video = fild_search
@@ -35,7 +35,7 @@ def download_mp3(fild_search: str):
 
         ydl_opts = {
             "format": "bestvideo+bestaudio/best",
-            "outtmpl": "database/video.mkv",
+            "outtmpl": "database/video",
             "noplaylist": True,
             "postprocessors": [{
                 "key": "FFmpegVideoConvertor",
