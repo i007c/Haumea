@@ -130,6 +130,11 @@ dmypy.json
 
 # my data base [token and more ...]
 db/
+database/
+
+# nohup file
+nohup.out
+
 # coala files 
 *.py.orig
-nohup.out
+
