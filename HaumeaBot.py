@@ -105,7 +105,7 @@ def send_file(bot, context):
             msg = bot.edit_message_text(chat_id=chat_id, text="درحال اپلود ویدیو مورد نظر شما", message_id=msg.message_id)
             
             bot.send_chat_action(chat_id, ChatAction.UPLOAD_VIDEO)
-            bot.send_video(chat_id=chat_id, video=open(data_files["video"]["path"], "rb"), timeout=7000)
+            bot.send_document(chat_id=chat_id, document=open(data_files["video"]["path"], "rb"), timeout=7000)
 
             bot.send_chat_action(chat_id, ChatAction.UPLOAD_AUDIO)
             bot.send_audio(chat_id=chat_id, audio=open(data_files["audio"]["path"], "rb"), timeout=1000)
