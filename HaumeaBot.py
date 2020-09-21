@@ -34,13 +34,12 @@ def download_mp3(fild_search: str):
             link_video = utube_search.search_on_utube(fild_search)[0]["video_link"]
 
         ydl_opts = {
-            "format": "bestvideo/best",
+            "format": "bestvideo+bestaudio/best",
             "outtmpl": "database/video.mp4",
             "noplaylist": True,
             "postprocessors": [{
                     "key": "FFmpegVideoConvertor",
                     "preferredcodec": "mp4",
-                    "preferredquality": "192"
             }]
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
