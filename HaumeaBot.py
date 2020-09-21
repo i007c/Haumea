@@ -113,7 +113,7 @@ def send_file(bot, context):
             bot.send_chat_action(chat_id, ChatAction.TYPING)
             msg = bot.edit_message_text(chat_id=chat_id, text="درحال اپلود موسیقی مورد نظر شما", message_id=msg.message_id)
             
-            if os.path.getsize(data_files["video"]["path"]) < 50000000:
+            if os.path.getsize(data_files["audio"]["path"]) < 50000000:
                 bot.send_chat_action(chat_id, ChatAction.UPLOAD_AUDIO)
                 bot.send_audio(chat_id=chat_id, audio=open(data_files["audio"]["path"], "rb"), timeout=1000)
             else:
