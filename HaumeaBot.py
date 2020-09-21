@@ -38,8 +38,8 @@ def download_mp3(fild_search: str):
             "outtmpl": "database/video.mp4",
             "noplaylist": True,
             "postprocessors": [{
-                    "key": "FFmpegVideoConvertor",
-                    "preferredcodec": "mp4",
+                "key": "FFmpegVideoConvertor",
+                "preferedformat": "mp4",
             }]
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
