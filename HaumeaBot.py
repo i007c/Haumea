@@ -117,12 +117,10 @@ def send_file(bot, context):
             bot.delete_message(chat_id=chat_id, message_id=msg.message_id)
 
             if os.path.exists(data_files["video"]["path"]):
-                pass
-                # os.remove(data_files["video"]["path"])
+                os.remove(data_files["video"]["path"])
             
             if os.path.exists(data_files["audio"]["path"]):
-                pass
-                # os.remove(data_files["audio"]["path"])
+                os.remove(data_files["audio"]["path"])
 
     except Exception as err:
         save_error_to_log(traceback.format_exc())
