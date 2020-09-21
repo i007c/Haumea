@@ -171,7 +171,7 @@ def reporterr(bot, context):
 
 def main():
     token = json.load(open("db/sec.json", "r"))["token"]
-    updater = Updater(token, use_context=True)
+    updater = Updater(token, use_context=False)
 
     dp = updater.dispatcher
 
