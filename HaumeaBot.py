@@ -12,6 +12,7 @@ import youtube_dl
 import utube_search
 import datetime
 import traceback
+import ffmpeg
 
 def save_error_to_log(error_message):
     error_message = str(error_message)
@@ -23,6 +24,9 @@ def download_mp3(fild_search: str):
     try:
         if os.path.exists("database/audio.mp3"):
             os.remove("database/audio.mp3")
+        
+        if os.path.exists("database/video.mp4"):
+            os.remove("database/video.mp4")
 
         if fild_search.find("youtube.com") != -1 or fild_search.find("youtu.be") != -1:
             link_video = fild_search
@@ -30,18 +34,21 @@ def download_mp3(fild_search: str):
             link_video = utube_search.search_on_utube(fild_search)[0]["video_link"]
 
         ydl_opts = {
-            "format": "bestaudio/best",
-            "outtmpl": "database/audio.mp3",
+            "format": "bestvideo/best",
+            "outtmpl": "database/video.mp4",
             "noplaylist": True,
             "postprocessors": [{
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
+                    "key": "FFmpegVideoConvertorPP",
+                    "preferredcodec": "mp4",
                     "preferredquality": "192"
             }]
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([link_video])
-
+        
+        audio = ffmpeg.input("database/video.mp4")
+        audio = ffmpeg.output(audio, "database/audio.mp3")
+        ffmpeg.run(audio)
         return {"audio_path": "database/audio.mp3", "audio_name": "audio.mp3"}
 
     except Exception:
@@ -73,7 +80,7 @@ def send_music(bot, context):
         name_music = context.message.text
 
         bot.send_chat_action(chat_id, ChatAction.TYPING)
-        msg = bot.send_message(chat_id=chat_id, text="درحال جستوجو در یوتیوب")
+        msg = bot.send_message(chat_id=chat_id, text="درحال دانلود موسیقی مدنظر شما\nلطفا کمی صبر کنید")
         audio_data = download_mp3(name_music)
 
         if not audio_data:
