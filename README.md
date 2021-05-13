@@ -5,7 +5,7 @@ Haumea is the name of a planet
 
 Written with Python 3
 
-# Use
+# Use 
 
 
 ``` python3 HaumeaBot.py ```
