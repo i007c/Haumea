@@ -10,9 +10,9 @@ future==0.18.2
 idna==2.10
 pycparser==2.20
 python-telegram-bot==12.8
-requests==2.24.0
+requests
 six==1.15.0
 soupsieve==2.0.1
 tornado==6.0.4
-urllib3==1.25.10
+urllib3
 youtube-dl==2020.9.20
